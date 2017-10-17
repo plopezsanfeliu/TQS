@@ -6,11 +6,16 @@ enum pin {
 	BLANC, NEGRE, BUIT
 };
 
+enum estat {
+	JUGANT, GUANYAT, PERDUT
+};
+
 public class Joc {
 	private pin[] resultat;
 	private int[] combinacio;
 	private int[] usuari;
 	private int torn = 0;
+	private estat estatJoc;
 
 	public int[] getCombinacio() {
 		return combinacio;
@@ -36,16 +41,28 @@ public class Joc {
 		this.combinacio = new int[4];
 		this.usuari = new int[4];
 		this.resultat = new pin[4];
+		this.estatJoc = estat.JUGANT;
+	}
+	
+	public estat getEstat() {
+		return this.estatJoc;
 	}
 
-	public void setUsuari(int i, int j, int k, int l) {
-		if (i >= 0 && i < 6 && j >= 0 && j < 6 && k >= 0 && k < 6 && l >= 0 && l < 6) {
+	public void intentUsuari(int i, int j, int k, int l) {
+		final int MAX = 6;
+		final int MIN = 0;
+		if (i >= MIN && i < MAX && j >= MIN && j < MAX && k >= MIN && k < MAX && l >= MIN && l < MAX) {
 			this.usuari[0] = i;
 			this.usuari[1] = j;
 			this.usuari[2] = k;
 			this.usuari[3] = l;
 		} else {
 			this.usuari = null;
+		}
+		
+		this.torn++;
+		if(this.torn > 7) {
+			this.estatJoc = estat.PERDUT;
 		}
 	}
 
@@ -61,6 +78,8 @@ public class Joc {
 	}
 
 	public void comprobarPins() {
+		final int MAX_TORNS = 9;
+		int suma = 0;
 		for (int i = 0; i < this.resultat.length; i++) {
 			this.resultat[i] = pin.BUIT;
 			if (this.usuari[i] == this.combinacio[i]) {
@@ -76,6 +95,16 @@ public class Joc {
 					}
 				}
 			}
+		}
+		
+		for (int i = 0; i < this.resultat.length; i++) {
+			if(resultat[i] == pin.NEGRE) {
+				suma++;
+			}
+		}
+		
+		if(suma == 4 && this.torn < MAX_TORNS) {
+			this.estatJoc = estat.GUANYAT;
 		}
 	}
 
@@ -94,35 +123,47 @@ public class Joc {
 		}
 	}
 
+	public boolean comprovarEntrada(int usuari) {
+		boolean valid = false;
+
+		if(usuari > -1 && usuari < 5556) { 
+			valid = true;
+		}
+		return valid;
+	}
+
 	public void juga() {
 		Scanner entrada = new Scanner(System.in);
 
 		this.generarCombinacio(true);
 
 		do {
-			int d;
+			String numero;
+			int d = 0;
 
 			do {
-				System.out.println("\nIntrodueix la combinació (nombres entre 0 i 5): ");
-				d = entrada.nextInt();
-			} while (d / 1000 > 5 || (d % 1000) / 100 > 5 || (d % 100) / 10 > 5 || (d % 10) > 5);
+				System.out.println("\nIntrodueix la combinació de 4 nombres (entre 0 i 5): ");				
+				numero = entrada.nextLine();
+				d = Integer.parseInt(numero);
+			} while (!comprovarEntrada(d) || numero.length() != 4);
 
-			this.setUsuari(d / 1000, (d % 1000) / 100, (d % 100) / 10, (d % 10));
+			this.intentUsuari(d / 1000, (d % 1000) / 100, (d % 100) / 10, (d % 10));
 
 			this.comprobarPins();
 			this.imprimirPins();
 
-			this.torn++;
+		} while (this.estatJoc == estat.JUGANT && this.usuari != null);
 
-		} while ((this.combinacio[0] != this.usuari[0] || this.combinacio[1] != this.usuari[1]
-				|| this.combinacio[2] != this.usuari[2] || this.combinacio[3] != this.usuari[3]) && this.torn < 8
-				&& this.usuari != null);
-
-		if(this.torn < 9) {
-			System.out.println("Has guanyat la partida en " + this.torn + " torns!");
+		if(this.estatJoc == estat.GUANYAT) {
+			System.out.println("Has guanyat la partida en el torn " + this.torn + "!");
 		}
 		else {
-			System.out.println("S'han esgotat els 8 torns :(");
+			if(this.estatJoc == estat.PERDUT) {
+				System.out.println("S'han esgotat els 8 torns :(");
+			}
+			else {
+				System.out.println("Error no tractat");
+			}
 		}
 
 		entrada.close();
