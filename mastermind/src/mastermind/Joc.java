@@ -43,7 +43,7 @@ public class Joc {
 		this.resultat = new pin[4];
 		this.estatJoc = estat.JUGANT;
 	}
-	
+
 	public estat getEstat() {
 		return this.estatJoc;
 	}
@@ -59,7 +59,7 @@ public class Joc {
 		} else {
 			this.usuari = null;
 		}
-		
+
 		this.torn++;
 		if(this.torn > 7) {
 			this.estatJoc = estat.PERDUT;
@@ -96,13 +96,13 @@ public class Joc {
 				}
 			}
 		}
-		
+
 		for (int i = 0; i < this.resultat.length; i++) {
 			if(resultat[i] == pin.NEGRE) {
 				suma++;
 			}
 		}
-		
+
 		if(suma == 4 && this.torn < MAX_TORNS) {
 			this.estatJoc = estat.GUANYAT;
 		}
@@ -144,7 +144,11 @@ public class Joc {
 			do {
 				System.out.println("\nIntrodueix la combinació de 4 nombres (entre 0 i 5): ");				
 				numero = entrada.nextLine();
-				d = Integer.parseInt(numero);
+				try {
+					d = Integer.parseInt(numero);
+				} catch (NumberFormatException e) {
+					System.out.println("Introdueix un valor correcte!");
+				}
 			} while (!comprovarEntrada(d) || numero.length() != 4);
 
 			this.intentUsuari(d / 1000, (d % 1000) / 100, (d % 100) / 10, (d % 10));
