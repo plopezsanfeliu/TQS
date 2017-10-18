@@ -25,7 +25,7 @@ public class JocTest {
 		assertTrue(j.comprovarEntrada(0000));
 		
 		// Cas intermig
-		assertTrue(j.comprovarEntrada(1253));
+		assertTrue(j.comprovarEntrada(0253));
 
 		// Cas límit superior
 		assertTrue(j.comprovarEntrada(5555));
@@ -45,7 +45,7 @@ public class JocTest {
 	 * mitjançant línies de codi.
 	 */
 	@Test
-	public void testSetUsuari() {
+	public void testIntentUsuari() {
 		this.j = new Joc();
 
 		// Comencem amb apostes incorrectes, comprovem que la aposta és null i,
