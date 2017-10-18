@@ -23,9 +23,9 @@ public class JocTest {
 
 		// Cas límit inferior correcte
 		assertTrue(j.comprovarEntrada(0000));
-		
+
 		// Cas intermig
-		assertTrue(j.comprovarEntrada(0253));
+		assertTrue(j.comprovarEntrada(1234));
 
 		// Cas límit superior
 		assertTrue(j.comprovarEntrada(5555));
@@ -225,6 +225,8 @@ public class JocTest {
 			this.j.comprobarPins();
 		}
 
+		// Un cop perdut, introduïm la combinació correcta i comprovem que
+		// no tenim l'estat de guanyat, pel que no es pot fer trampes.
 		this.j.intentUsuari(0, 1, 2, 3);
 		this.j.comprobarPins();
 		assertEquals(estat.PERDUT, this.j.getEstat());

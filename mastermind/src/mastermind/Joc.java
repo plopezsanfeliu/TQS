@@ -11,11 +11,11 @@ enum estat {
 };
 
 public class Joc {
-	private pin[] resultat;
-	private int[] combinacio;
-	private int[] usuari;
-	private int torn = 0;
-	private estat estatJoc;
+	private pin[] resultat; // Array de pins negre-blanc-buit
+	private int[] combinacio; // Combinació a endevinar
+	private int[] usuari; // Combinació d'entrada d'usuari
+	private int torn; // Número de torn
+	private estat estatJoc; // Estat actual del joc
 
 	public int[] getCombinacio() {
 		return combinacio;
@@ -41,6 +41,8 @@ public class Joc {
 		this.combinacio = new int[4];
 		this.usuari = new int[4];
 		this.resultat = new pin[4];
+
+		this.torn = 0;
 		this.estatJoc = estat.JUGANT;
 	}
 
@@ -127,11 +129,11 @@ public class Joc {
 
 	public boolean comprovarEntrada(int usuari) {
 		final int MIN = 0, MAX = 5;
-		int[] valors = {usuari / 1000, (usuari % 1000) / 100, (usuari % 100) / 10, (usuari % 10) };
+		int[] valors = { usuari / 1000, (usuari % 1000) / 100, (usuari % 100) / 10, (usuari % 10) };
 		boolean valid = true;
-		
+
 		for (int i : valors) {
-			if(i < MIN || i > MAX) {
+			if (i < MIN || i > MAX) {
 				valid = false;
 			}
 		}
