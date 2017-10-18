@@ -129,9 +129,9 @@ public class Joc {
 		final int MIN = 0, MAX = 5;
 		int[] valors = {usuari / 1000, (usuari % 1000) / 100, (usuari % 100) / 10, (usuari % 10) };
 		boolean valid = true;
-
+		
 		for (int i : valors) {
-			if(i < MIN || MAX > 5) {
+			if(i < MIN || i > MAX) {
 				valid = false;
 			}
 		}

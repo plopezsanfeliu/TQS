@@ -23,9 +23,9 @@ public class JocTest {
 
 		// Cas límit inferior correcte
 		assertTrue(j.comprovarEntrada(0000));
-
-		// Valor intermedi correce que correspondria al 0 2 5 6
-		assertTrue(j.comprovarEntrada(256));
+		
+		// Cas intermig
+		assertTrue(j.comprovarEntrada(1253));
 
 		// Cas límit superior
 		assertTrue(j.comprovarEntrada(5555));
