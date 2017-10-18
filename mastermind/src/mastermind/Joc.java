@@ -61,9 +61,6 @@ public class Joc {
 		}
 
 		this.torn++;
-		if(this.torn > 7) {
-			this.estatJoc = estat.PERDUT;
-		}
 	}
 
 	public void generarCombinacio(boolean imprimir) {
@@ -78,33 +75,38 @@ public class Joc {
 	}
 
 	public void comprobarPins() {
-		final int MAX_TORNS = 9;
-		int suma = 0;
-		for (int i = 0; i < this.resultat.length; i++) {
-			this.resultat[i] = pin.BUIT;
-			if (this.usuari[i] == this.combinacio[i]) {
-				this.resultat[i] = pin.NEGRE;
-			} else {
-				int j = 0;
-				for (int k = 0; k < 3; k++, j++) {
-					if (j == i) {
-						j++;
-					}
-					if (this.resultat[i] == pin.BLANC || this.usuari[i] == this.combinacio[j]) {
-						this.resultat[i] = pin.BLANC;
+		if (this.estatJoc != estat.PERDUT) {
+			int suma = 0;
+			for (int i = 0; i < this.resultat.length; i++) {
+				this.resultat[i] = pin.BUIT;
+				if (this.usuari[i] == this.combinacio[i]) {
+					this.resultat[i] = pin.NEGRE;
+				} else {
+					int j = 0;
+					for (int k = 0; k < 3; k++, j++) {
+						if (j == i) {
+							j++;
+						}
+						if (this.resultat[i] == pin.BLANC || this.usuari[i] == this.combinacio[j]) {
+							this.resultat[i] = pin.BLANC;
+						}
 					}
 				}
 			}
-		}
 
-		for (int i = 0; i < this.resultat.length; i++) {
-			if(resultat[i] == pin.NEGRE) {
-				suma++;
+			for (int i = 0; i < this.resultat.length; i++) {
+				if (resultat[i] == pin.NEGRE) {
+					suma++;
+				}
 			}
-		}
 
-		if(suma == 4 && this.torn < MAX_TORNS) {
-			this.estatJoc = estat.GUANYAT;
+			if (suma == 4) {
+				this.estatJoc = estat.GUANYAT;
+			} else {
+				if (this.torn > 7) {
+					this.estatJoc = estat.PERDUT;
+				}
+			}
 		}
 	}
 
@@ -124,11 +126,16 @@ public class Joc {
 	}
 
 	public boolean comprovarEntrada(int usuari) {
-		boolean valid = false;
+		final int MIN = 0, MAX = 5;
+		int[] valors = {usuari / 1000, (usuari % 1000) / 100, (usuari % 100) / 10, (usuari % 10) };
+		boolean valid = true;
 
-		if(usuari > -1 && usuari < 5556) { 
-			valid = true;
+		for (int i : valors) {
+			if(i < MIN || MAX > 5) {
+				valid = false;
+			}
 		}
+
 		return valid;
 	}
 
@@ -142,7 +149,7 @@ public class Joc {
 			int d = 0;
 
 			do {
-				System.out.println("\nIntrodueix la combinació de 4 nombres (entre 0 i 5): ");				
+				System.out.println("\nIntrodueix la combinació de 4 nombres (entre 0 i 5): ");
 				numero = entrada.nextLine();
 				try {
 					d = Integer.parseInt(numero);
@@ -158,18 +165,15 @@ public class Joc {
 
 		} while (this.estatJoc == estat.JUGANT && this.usuari != null);
 
-		if(this.estatJoc == estat.GUANYAT) {
+		if (this.estatJoc == estat.GUANYAT) {
 			System.out.println("Has guanyat la partida en el torn " + this.torn + "!");
-		}
-		else {
-			if(this.estatJoc == estat.PERDUT) {
+		} else {
+			if (this.estatJoc == estat.PERDUT) {
 				System.out.println("S'han esgotat els 8 torns :(");
-			}
-			else {
+			} else {
 				System.out.println("Error no tractat");
 			}
 		}
-
 		entrada.close();
 	}
 

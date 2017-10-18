@@ -9,8 +9,8 @@ public class JocTest {
 	private Joc j;
 
 	/**
-	 * Les entrades de l'usuari poden anar de 0000 a 5555, que es parseja a int
-	 * al programa. Es comproven els casos límit i valors incorrectes.
+	 * Les entrades de l'usuari poden anar de 0000 a 5555, que es parseja a int al
+	 * programa. Es comproven els casos límit i valors incorrectes.
 	 */
 	@Test
 	public void testComprovarEntrada() {
@@ -40,9 +40,9 @@ public class JocTest {
 
 	/**
 	 * Inicialitzem unes apostes d'usuari, entre les quals n'hi ha de correctes i
-	 * que no són vàlides, comprovem que s'accepten o no correctament.
-	 * En test anterior simulavem entrada per teclat i en aquest mirem de crear
-	 * el tauler mitjançant línies de codi.
+	 * que no són vàlides, comprovem que s'accepten o no correctament. En test
+	 * anterior simulavem entrada per teclat i en aquest mirem de crear el tauler
+	 * mitjançant línies de codi.
 	 */
 	@Test
 	public void testSetUsuari() {
@@ -97,7 +97,6 @@ public class JocTest {
 	@Test
 	public void testGenerarCombinacio() {
 		final int MAX_COMBI = 100;
-		final int POSICIONS = 4;
 
 		this.j = new Joc();
 
@@ -106,7 +105,7 @@ public class JocTest {
 			// el valor de la combinació per pantalla.
 			int[] combinacio = this.j.getCombinacio();
 
-			for (int j = 0; j < POSICIONS; j++) {
+			for (int j = 0; j < combinacio.length; j++) {
 				assertTrue(combinacio[j] > -1);
 				assertTrue(combinacio[j] < 6);
 			}
@@ -119,8 +118,6 @@ public class JocTest {
 	 */
 	@Test
 	public void testComprovarPins() {
-		final int POS = 4;
-
 		this.j = new Joc();
 
 		// Creem cas en que no s'encerti ni una, pel que el resultat haurà de ser
@@ -131,7 +128,7 @@ public class JocTest {
 		this.j.setUsuari(usuari1);
 		this.j.comprobarPins();
 
-		for (int i = 0; i < POS; i++) {
+		for (int i = 0; i < this.j.getResultat().length; i++) {
 			assertEquals(pin.BUIT, this.j.getResultat()[i]);
 		}
 
@@ -143,7 +140,7 @@ public class JocTest {
 		this.j.setUsuari(usuari2);
 		this.j.comprobarPins();
 
-		for (int i = 0; i < POS; i++) {
+		for (int i = 0; i < this.j.getResultat().length; i++) {
 			assertEquals(pin.BLANC, this.j.getResultat()[i]);
 		}
 
@@ -154,7 +151,7 @@ public class JocTest {
 		this.j.setUsuari(usuari3);
 		this.j.comprobarPins();
 
-		for (int i = 0; i < POS; i++) {
+		for (int i = 0; i < this.j.getResultat().length; i++) {
 			assertEquals(pin.NEGRE, this.j.getResultat()[i]);
 		}
 
@@ -171,7 +168,6 @@ public class JocTest {
 		assertEquals(pin.NEGRE, this.j.getResultat()[3]);
 
 	}
-
 
 	/**
 	 * Comprovacions de l'estat del joc en funció de diferentes situacions.
@@ -195,7 +191,7 @@ public class JocTest {
 		this.j = new Joc();
 		this.j.setCombinacio(combinacio1);
 
-		for(int i = 0; i < 8; i++) {			
+		for (int i = 0; i < 8; i++) {
 			this.j.intentUsuari(3, 2, 1, 0);
 			this.j.comprobarPins();
 		}
@@ -206,7 +202,7 @@ public class JocTest {
 		this.j = new Joc();
 		this.j.setCombinacio(combinacio1);
 
-		for(int i = 0; i < 7; i++) {
+		for (int i = 0; i < 7; i++) {
 			this.j.intentUsuari(3, 2, 1, 0);
 			this.j.comprobarPins();
 		}
@@ -219,17 +215,16 @@ public class JocTest {
 		// I comprovem que hem guanyat la partida.
 		assertEquals(estat.GUANYAT, this.j.getEstat());
 
-
 		// Procedim a tractar un cas especial, comprovem que, un cop perdut, no
 		// és possible guanyar fent un altre intent i encertant (fer trampes).
 		this.j = new Joc();
 		this.j.setCombinacio(combinacio1);
 
-		for(int i = 0; i < 8; i++) {			
+		for (int i = 0; i < 8; i++) {
 			this.j.intentUsuari(3, 2, 1, 0);
 			this.j.comprobarPins();
 		}
-		
+
 		this.j.intentUsuari(0, 1, 2, 3);
 		this.j.comprobarPins();
 		assertEquals(estat.PERDUT, this.j.getEstat());
