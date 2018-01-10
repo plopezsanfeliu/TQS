@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import buscamines.MockJoc;
+
 /**
  * Classe de test del joc del buscamines.
  * 
@@ -46,34 +48,39 @@ public class JocTest {
 	 */
 	@Test
 	public void testInitTauler() {
+		final int MAX_LOOPS = 100;
 		dificultat[] dificultats = { dificultat.FACIL, dificultat.MIG, dificultat.DIFICIL };
 
-		for (dificultat dificultat_actual : dificultats) {
-			this.j = new Joc(dificultat_actual);
-			j.initTauler();
+		// INICI LOOP TEST
+		for (int iter = 0; iter < MAX_LOOPS; iter++) {
+			for (dificultat dificultat_actual : dificultats) {
+				this.j = new Joc(dificultat_actual);
+				j.initTauler();
 
-			int m = 0, n = 0;
-			switch (dificultat_actual) {
-			case FACIL:
-				m = 10;
-				n = 10;
-				break;
-			case MIG:
-				m = 16;
-				n = 16;
-				break;
-			case DIFICIL:
-				m = 16;
-				n = 30;
-				break;
-			}
+				int m = 0, n = 0;
+				switch (dificultat_actual) {
+				case FACIL:
+					m = 10;
+					n = 10;
+					break;
+				case MIG:
+					m = 16;
+					n = 16;
+					break;
+				case DIFICIL:
+					m = 16;
+					n = 30;
+					break;
+				}
 
-			for (int i = 0; i < m; i++) {
-				for (int j = 0; j < n; j++) {
-					assertEquals(estat.LLIURE, this.j.getTauler()[i][j]);
+				for (int i = 0; i < m; i++) {
+					for (int j = 0; j < n; j++) {
+						assertEquals(casella.LLIURE, this.j.getTauler()[i][j]);
+					}
 				}
 			}
 		}
+
 	}
 
 	/**
@@ -83,103 +90,67 @@ public class JocTest {
 	@Test
 	public void testInitMines() {
 		// Comencem amb dificultat fàcil
-		int m = 10;
-		int n = 10;
-		int esperat = 10;
-		int suma = 0;
-		this.j = new Joc(dificultat.FACIL);
-		this.j.initTauler();
-		this.j.initMines();
+		int m, n, esperat, suma, i;
+		final int MAX_LOOPS = 100;
 
-		for (int i = 0; i < m; i++) {
-			for (int j = 0; j < n; j++) {
-				if (this.j.getTauler()[i][j] == estat.MINA) {
-					suma++;
+		// INICI LOOP TEST
+		for (int iter = 0; iter < MAX_LOOPS; iter++) {
+			suma = 0;
+			esperat = 10;
+			m = 10;
+			n = 10;
+
+			this.j = new Joc(dificultat.FACIL);
+			this.j.initTauler();
+			this.j.initMines();
+
+			for (i = 0; i < m; i++) {
+				for (int j = 0; j < n; j++) {
+					if (this.j.getTauler()[i][j] == casella.MINA) {
+						suma++;
+					}
 				}
 			}
-		}
-		assertEquals(esperat, suma);
+			assertEquals(esperat, suma);
 
-		// Reiniciem tauler fàcil
-		suma = 0;
-		this.j.initTauler();
-		this.j.initMines();
+			// Cambiem a tauler mig
+			suma = 0;
+			esperat = 40;
+			m = 16;
+			n = 16;
 
-		for (int i = 0; i < m; i++) {
-			for (int j = 0; j < n; j++) {
-				if (this.j.getTauler()[i][j] == estat.MINA) {
-					suma++;
+			this.j = new Joc(dificultat.MIG);
+			this.j.initTauler();
+			this.j.initMines();
+
+			for (i = 0; i < m; i++) {
+				for (int j = 0; j < n; j++) {
+					if (this.j.getTauler()[i][j] == casella.MINA) {
+						suma++;
+					}
 				}
 			}
-		}
-		assertEquals(esperat, suma);
+			assertEquals(esperat, suma);
 
-		// Cambiem a tauler mig
-		suma = 0;
-		esperat = 40;
-		m = 16;
-		n = 16;
+			// Cambiem a tauler difícil
+			suma = 0;
+			esperat = 99;
+			m = 16;
+			n = 30;
 
-		this.j = new Joc(dificultat.MIG);
-		this.j.initTauler();
-		this.j.initMines();
+			this.j = new Joc(dificultat.DIFICIL);
+			this.j.initTauler();
+			this.j.initMines();
 
-		for (int i = 0; i < m; i++) {
-			for (int j = 0; j < n; j++) {
-				if (this.j.getTauler()[i][j] == estat.MINA) {
-					suma++;
+			for (i = 0; i < m; i++) {
+				for (int j = 0; j < n; j++) {
+					if (this.j.getTauler()[i][j] == casella.MINA) {
+						suma++;
+					}
 				}
 			}
+			assertEquals(esperat, suma);
 		}
-		assertEquals(esperat, suma);
-
-		// Reiniciem tauler mig
-		suma = 0;
-		this.j.initTauler();
-		this.j.initMines();
-
-		for (int i = 0; i < m; i++) {
-			for (int j = 0; j < n; j++) {
-				if (this.j.getTauler()[i][j] == estat.MINA) {
-					suma++;
-				}
-			}
-		}
-		assertEquals(esperat, suma);
-
-		// Cambiem a tauler difícil
-		suma = 0;
-		esperat = 99;
-		m = 16;
-		n = 30;
-
-		this.j = new Joc(dificultat.DIFICIL);
-		this.j.initTauler();
-		this.j.initMines();
-
-		for (int i = 0; i < m; i++) {
-			for (int j = 0; j < n; j++) {
-				if (this.j.getTauler()[i][j] == estat.MINA) {
-					suma++;
-				}
-			}
-		}
-		assertEquals(esperat, suma);
-
-		// Reiniciem tauler dificil
-		suma = 0;
-		this.j.initTauler();
-		this.j.initMines();
-
-		for (int i = 0; i < m; i++) {
-			for (int j = 0; j < n; j++) {
-				if (this.j.getTauler()[i][j] == estat.MINA) {
-					suma++;
-				}
-			}
-		}
-		assertEquals(esperat, suma);
-
 	}
 
 	/**
@@ -189,42 +160,54 @@ public class JocTest {
 	@Test
 	public void testComprovarMines() {
 		/*
-		 * Tauler 1: 
-		 * O X O O O O O O O O
-		 * O O O O O O X O X O
-		 * O X O O O O X O O O
-		 * O O O O O O O O O O
-		 * O O O O O O O O O O
-		 * O O O X O O O O O O
-		 * O O O O O O O X O O
-		 * O O O O O O O O O O
-		 * O X O O O O O O X O
-		 * O O O O O O O O O X
+		 * Tauler 1: O X O O O O O O O O O O O O O O X O X O O X O O O O X O O O O O O O
+		 * O O O O O O O O O O O O O O O O O O O X O O O O O O O O O O O O O X O O O O O
+		 * O O O O O O O O X O O O O O O X O O O O O O O O O O X
 		 */
 		this.j = new Joc(dificultat.FACIL);
 		this.j.initTauler();
 
-		estat[][] tauler1 = { { estat.LLIURE, estat.MINA, estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.LLIURE }, 
-				{ estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.MINA, estat.LLIURE, estat.MINA, estat.LLIURE }, 
-				{ estat.LLIURE, estat.MINA, estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.MINA, estat.LLIURE, estat.LLIURE, estat.LLIURE }, 
-				{ estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.LLIURE }, 
-				{ estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.LLIURE }, 
-				{ estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.MINA, estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.LLIURE }, 
-				{ estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.MINA, estat.LLIURE, estat.LLIURE }, 
-				{ estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.LLIURE }, 
-				{ estat.LLIURE, estat.MINA, estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.MINA, estat.LLIURE }, 
-				{ estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.LLIURE, estat.MINA }, };
+		casella[][] tauler1 = {
+				{ casella.LLIURE, casella.MINA, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE,
+					casella.LLIURE, casella.LLIURE, casella.LLIURE },
+				{ casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.MINA,
+						casella.LLIURE, casella.MINA, casella.LLIURE },
+				{ casella.LLIURE, casella.MINA, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.MINA,
+							casella.LLIURE, casella.LLIURE, casella.LLIURE },
+				{ casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE,
+								casella.LLIURE, casella.LLIURE, casella.LLIURE },
+				{ casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE,
+									casella.LLIURE, casella.LLIURE, casella.LLIURE },
+				{ casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.MINA, casella.LLIURE, casella.LLIURE, casella.LLIURE,
+										casella.LLIURE, casella.LLIURE, casella.LLIURE },
+				{ casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE,
+											casella.MINA, casella.LLIURE, casella.LLIURE },
+				{ casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE,
+												casella.LLIURE, casella.LLIURE, casella.LLIURE },
+				{ casella.LLIURE, casella.MINA, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE,
+													casella.LLIURE, casella.MINA, casella.LLIURE },
+				{ casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE,
+														casella.LLIURE, casella.LLIURE, casella.MINA }, };
 
 		j.initMines(); // Fa set a l'atribut casellesLliures
 		j.setTauler(tauler1);
 
 		// Comprovem en primer lloc que hi ha 90 caselles lliures
-		assertEquals(100-10, j.getCasellesLliures());
+		assertEquals(100 - 10, j.getCasellesLliures());
 
 		// Repetim comprovació després d'haver trepitxat una casella lliure i
 		// veiem que decrementa
 		j.trepitja(1, 1);
-		assertEquals(100-10-1, j.getCasellesLliures());
+		assertEquals(100 - 10 - 1, j.getCasellesLliures());
+		
+		// Com queda només una mina repetim la última trepitjada i comprovem que tot
+		// i així no decrementa el comptador de mines al ser la mateixa.
+		j.trepitja(1, 1);
+		
+		// Trepitgem una casella invàlida (fora de tauler) i comprovem que el
+		// joc no peta.
+		j.trepitja(1, 66);
+		j.trepitja(66, 1);
 
 		// Trepitxem mina i comprovem final de joc
 		assertFalse(j.getExplosio()); // No final
@@ -239,18 +222,70 @@ public class JocTest {
 		j.setTauler(tauler1);
 
 		// Comprovem trepitjada a trepitjada que va decrementant el valor
-		assertEquals(100-10, j.getCasellesLliures());
+		assertEquals(100 - 10, j.getCasellesLliures());
 		j.trepitja(0, 0);
-		assertEquals(100-10-1, j.getCasellesLliures());
+		assertEquals(100 - 10 - 1, j.getCasellesLliures());
 		j.trepitja(0, 9);
-		assertEquals(100-10-2, j.getCasellesLliures());
+		assertEquals(100 - 10 - 2, j.getCasellesLliures());
 		j.trepitja(9, 0);
-		assertEquals(100-10-3, j.getCasellesLliures());
+		assertEquals(100 - 10 - 3, j.getCasellesLliures());
 		// Assegurem que no ha acabat el joc
 		assertFalse(j.getExplosio());
 		j.trepitja(9, 9); // Finalment trepitxem la mina de la cantonada
 		assertTrue(j.getExplosio());
 
 	}
+	
+	@Test
+	public void testPrintTauler() {
+		MockJoc m = new MockJoc(); // Tauler de referència de mock
+		this.j = new Joc(dificultat.FACIL);
+		this.j.initTauler();
+		
+		casella[][] tauler = {
+				{ casella.LLIURE, casella.MINA, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE,
+					casella.LLIURE, casella.LLIURE, casella.LLIURE },
+				{ casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.MINA,
+						casella.LLIURE, casella.MINA, casella.LLIURE },
+				{ casella.LLIURE, casella.MINA, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.MINA,
+							casella.LLIURE, casella.LLIURE, casella.LLIURE },
+				{ casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE,
+								casella.LLIURE, casella.LLIURE, casella.LLIURE },
+				{ casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE,
+									casella.LLIURE, casella.LLIURE, casella.LLIURE },
+				{ casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.MINA, casella.LLIURE, casella.LLIURE, casella.LLIURE,
+										casella.LLIURE, casella.LLIURE, casella.LLIURE },
+				{ casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE,
+											casella.MINA, casella.LLIURE, casella.LLIURE },
+				{ casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE,
+												casella.LLIURE, casella.LLIURE, casella.LLIURE },
+				{ casella.LLIURE, casella.MINA, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE,
+													casella.LLIURE, casella.MINA, casella.LLIURE },
+				{ casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE, casella.LLIURE,
+														casella.LLIURE, casella.LLIURE, casella.MINA }, };
+		j.setTauler(tauler);
+		
+		assertEquals(m.printTauler(), this.j.printTauler());
+
+		// Provem de trepitjar una casella i mirem que el resultat sigui l¡esperat
+		j.trepitja(4, 5);
+		String actual = "	1	2	3	4	5	6	7	8	9	10	\n" + 
+				"1	O 	X 	1 	 	 	1 	O 	O 	O 	O 	\n" + 
+				"2	O 	O 	2 	 	 	2 	X 	O 	X 	O 	\n" + 
+				"3	O 	X 	1 	 	 	2 	X 	3 	1 	1 	\n" + 
+				"4	O 	O 	1 	 	 	1 	1 	1 	 	 	\n" + 
+				"5	O 	O 	1 	1 	1 	 	 	 	 	 	\n" + 
+				"6	O 	O 	O 	X 	1 	 	1 	1 	1 	 	\n" + 
+				"7	O 	O 	1 	1 	1 	 	1 	X 	1 	 	\n" + 
+				"8	O 	O 	1 	 	 	 	1 	2 	2 	1 	\n" + 
+				"9	O 	X 	1 	 	 	 	 	1 	X 	O 	\n" + 
+				"10	O 	O 	1 	 	 	 	 	1 	O 	X \t\n";
+		assertEquals(actual, this.j.printTauler());
+		
+	}
 
 }
+
+// Exploratory testing: 205-209
+// Loop test: 55, 97
+// Mock objects: 241, 268

@@ -8,14 +8,14 @@ enum dificultat {
 	FACIL, MIG, DIFICIL
 };
 
-enum estat {
+enum casella {
 	MINA, LLIURE, DESCOBERT
 };
 
 public class Joc {
 
 	private dificultat dificultat;
-	private estat[][] tauler;
+	private casella[][] tauler;
 	private int casellesLliures;
 	private boolean explosio;
 
@@ -23,11 +23,11 @@ public class Joc {
 		return this.explosio;
 	}
 	
-	public estat[][] getTauler() {
+	public casella[][] getTauler() {
 		return this.tauler;
 	}
 
-	public void setTauler(estat[][] tauler) {
+	public void setTauler(casella[][] tauler) {
 		this.tauler = tauler;
 	}
 
@@ -41,17 +41,13 @@ public class Joc {
 
 		switch (this.dificultat) {
 		case FACIL:
-			this.tauler = new estat[10][10];
+			this.tauler = new casella[10][10];
 			break;
 		case MIG:
-			this.tauler = new estat[16][16];
+			this.tauler = new casella[16][16];
 			break;
 		case DIFICIL:
-			this.tauler = new estat[16][30];
-			break;
-		default:
-			this.tauler = null;
-			System.err.println("Cas no tractat");
+			this.tauler = new casella[16][30];
 			break;
 		}
 	}
@@ -60,7 +56,7 @@ public class Joc {
 		// Posem totes les caselles a lliures
 		for (int i = 0; i < this.tauler.length; i++) {
 			for (int j = 0; j < this.tauler[0].length; j++) {
-				this.tauler[i][j] = estat.LLIURE;
+				this.tauler[i][j] = casella.LLIURE;
 			}
 		}
 	}
@@ -83,9 +79,6 @@ public class Joc {
 		case DIFICIL:
 			nMines = 99;
 			break;
-		default:
-			System.err.println("Cas no tractat");
-			break;
 		}
 
 		ArrayList<Integer> valorsRandom = new ArrayList<>();
@@ -101,42 +94,42 @@ public class Joc {
 			int valor = valorsRandom.get(i);
 			int fila = valor / this.tauler[0].length;
 			int columna = valor % this.tauler[0].length;
-			this.tauler[fila][columna] = estat.MINA;
+			this.tauler[fila][columna] = casella.MINA;
 		}
 		this.casellesLliures = nCaselles - nMines;
 	}
 
-	public void printTauler() {
-		System.out.println("Caselles lliures: " + this.casellesLliures);
-		System.out.print("\t");
+	public String printTauler() {
+		String print = "";
+
+		print = print.concat("\t");
 		// Imprimim fila superior amb índex de números
 		for (int iter = 0; iter < this.tauler[0].length; iter++) {
-			System.out.print(iter + 1 + "\t");
+			print = print.concat(iter + 1 + "\t");
 		}
-		System.out.println();
+		print = print.concat("\n");
 		for (int fila = 0; fila < this.tauler.length; fila++) {
-			System.out.print(fila + 1 + "\t"); // Imprimim núm. de fila
+			print = print.concat(fila + 1 + "\t"); // Imprimim núm. de fila
 			for (int columna = 0; columna < this.tauler[0].length; columna++) {
 				switch (this.tauler[fila][columna]) {
 				case MINA:
-					System.out.print("X \t");
+					print = print.concat("X \t");
 					break;
 				case LLIURE:
-					System.out.print("O \t");
+					print = print.concat("O \t");
 					break;
 				case DESCOBERT:
 					if (this.recompteMines(fila, columna) == 0) {
-						System.out.print(" \t");
+						print = print.concat(" \t");
 					} else {
-						System.out.print(this.recompteMines(fila, columna) + " \t");
+						print = print.concat(this.recompteMines(fila, columna) + " \t");
 					}
-					break;
-				default:
 					break;
 				}
 			}
-			System.out.println();
+			print = print.concat("\n");
 		}
+		return print;
 	}
 
 	public int recompteMines(int a, int b) {
@@ -147,7 +140,7 @@ public class Joc {
 		for (int x = Math.max(0, a - 1); x <= Math.min(a + 1, limitFila); x++) {
 			for (int y = Math.max(0, b - 1); y <= Math.min(b + 1, limitColumna); y++) {
 				if (x != a || y != b) {
-					if (tauler[x][y] == estat.MINA) {
+					if (tauler[x][y] == casella.MINA) {
 						suma++;
 					}
 				}
@@ -169,7 +162,7 @@ public class Joc {
 			case DESCOBERT:
 				break;
 			case LLIURE:
-				this.tauler[fila][columna] = estat.DESCOBERT;
+				this.tauler[fila][columna] = casella.DESCOBERT;
 				this.casellesLliures--;
 				// Funció descobriment recursiva
 				if (this.recompteMines(fila, columna) == 0) {
@@ -177,7 +170,7 @@ public class Joc {
 						for (int y = Math.max(0, columna - 1); y <= Math.min(columna + 1,
 								this.tauler[0].length - 1); y++) {
 							if (x != fila || y != columna) {
-								if (tauler[x][y] != estat.MINA) {
+								if (tauler[x][y] != casella.MINA) {
 									this.trepitja(x, y);
 								}
 							}
@@ -185,15 +178,10 @@ public class Joc {
 					}
 				}
 				break;
-			default:
-				System.out.println("================");
-				System.out.println("Error no tractat");
-				System.out.println("================");
-				break;
 			}
 		}
 	}
-
+/*
 	public void juga() {
 		Scanner entrada = new Scanner(System.in);
 		int fila, columna;
@@ -203,7 +191,7 @@ public class Joc {
 
 		if (this.tauler != null) {
 			do {
-				this.printTauler();
+				System.out.println(this.printTauler());
 				System.out.println("Introdueix la fila a trepitxar: ");
 				fila = entrada.nextInt() - 1;
 				System.out.println("Introdueix la columna a trepitxar: ");
@@ -211,7 +199,7 @@ public class Joc {
 
 				this.trepitja(fila, columna);
 			} while (this.casellesLliures > 0 && !explosio);
-			this.printTauler();
+			System.out.println(this.printTauler());
 			if (!explosio) {
 				System.out.println("Enhorabona, has guanyat la partida!");
 			} else {
@@ -248,5 +236,5 @@ public class Joc {
 		j.juga();
 
 		entrada.close();
-	}
+	}*/
 }

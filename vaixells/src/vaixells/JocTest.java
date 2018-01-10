@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import vaixells.Joc.casella;
 import vaixells.Joc.estat;
 
 /**
@@ -15,6 +16,19 @@ public class JocTest {
 	private Joc j;
 
 	/**
+	 * Testejem que els Enums no siguin nulls.
+	 */
+	@Test
+	public void testEnums() {
+		assertNotNull(estat.valueOf("INIT"));
+		assertNotNull(estat.valueOf("JUGANT"));
+		assertNotNull(estat.valueOf("GUANYAT"));
+		assertNotNull(casella.valueOf("AIGUA"));
+		assertNotNull(casella.valueOf("VAIXELL"));
+		assertNotNull(casella.valueOf("TOCAT"));
+	}
+	
+	/**
 	 * Creem taulers de diferentes mides i comprovem que s'ha inicialitzat el
 	 * joc amb la mida correcte en cada cas.
 	 */
@@ -24,20 +38,16 @@ public class JocTest {
 		// a paràmetre
 		this.j = new Joc(0);
 		assertNull(this.j.getTauler());
+		
+		this.j = new Joc(-1);
+		assertNull(this.j.getTauler());
 
-		// Comprovem altres casos != 0
-		this.j = new Joc(1);
-		// mirem l'alçada i l'amplada, que han de ser iguals entre ells
-		assertEquals(1, this.j.getTauler()[0].length, this.j.getTauler().length);
-
-		this.j = new Joc(2);
-		assertEquals(2, this.j.getTauler()[0].length, this.j.getTauler().length);
-
-		this.j = new Joc(5);
-		assertEquals(5, this.j.getTauler()[0].length, this.j.getTauler().length);
-
-		this.j = new Joc(100);
-		assertEquals(100, this.j.getTauler()[0].length, this.j.getTauler().length);
+		// LOOP TEST - comprovem altres casos < 0
+		for(int i = 1; i < 100; i++ ) {
+			this.j = new Joc(i);
+			// mirem l'alçada i l'amplada, que han de ser iguals entre ells
+			assertEquals(i, this.j.getTauler()[0].length, this.j.getTauler().length);
+		}
 	}
 
 	/**
@@ -54,7 +64,7 @@ public class JocTest {
 
 			for (int i = 0; i < m; i++) {
 				for (int j = 0; j < m; j++) {
-					assertEquals(estat.AIGUA, this.j.getTauler()[i][j]);
+					assertEquals(casella.AIGUA, this.j.getTauler()[i][j]);
 				}
 			}
 		}
@@ -75,7 +85,10 @@ public class JocTest {
 
 		this.j = new Joc(m);
 		this.j.initTauler();
+		assertTrue(j.getEstat().equals(estat.INIT));
 		this.j.initVaixells(v);
+		assertFalse(j.getEstat().equals(estat.JUGANT));
+		assertFalse(j.getEstat().equals(estat.GUANYAT));
 
 		assertNull(this.j.getTauler());
 
@@ -85,8 +98,10 @@ public class JocTest {
 
 		this.j = new Joc(m);
 		this.j.initTauler();
+		assertTrue(j.getEstat().equals(estat.INIT));
 		this.j.initVaixells(v);
-
+		assertFalse(j.getEstat().equals(estat.JUGANT));
+		assertFalse(j.getEstat().equals(estat.GUANYAT));
 		assertNull(this.j.getTauler());
 
 		// Provem cas límit amb totes les caselles vaixells (cas acceptable,
@@ -96,8 +111,10 @@ public class JocTest {
 
 		this.j = new Joc(m);
 		this.j.initTauler();
+		assertTrue(j.getEstat().equals(estat.INIT));
 		this.j.initVaixells(v);
-
+		assertTrue(j.getEstat().equals(estat.JUGANT));
+		assertFalse(j.getEstat().equals(estat.GUANYAT));
 		assertNotNull(this.j.getTauler());
 
 		// Finalment provem un cas estàndard amb un tauler de 5x5 amb 5
@@ -107,8 +124,10 @@ public class JocTest {
 
 		this.j = new Joc(m);
 		this.j.initTauler();
+		assertTrue(j.getEstat().equals(estat.INIT));
 		this.j.initVaixells(v);
-
+		assertTrue(j.getEstat().equals(estat.JUGANT));
+		assertFalse(j.getEstat().equals(estat.GUANYAT));
 		assertNotNull(this.j.getTauler());
 	}
 
@@ -128,7 +147,7 @@ public class JocTest {
 
 		for (int i = 0; i < m; i++) {
 			for (int j = 0; j < m; j++) {
-				if (this.j.getTauler()[i][j] == estat.VAIXELL) {
+				if (this.j.getTauler()[i][j] == casella.VAIXELL) {
 					suma++;
 				}
 			}
@@ -147,9 +166,7 @@ public class JocTest {
 
 		for (int i = 0; i < m; i++) {
 			for (int j = 0; j < m; j++) {
-				if (this.j.getTauler()[i][j] == estat.VAIXELL) {
 					suma++;
-				}
 			}
 		}
 		assertEquals(v, suma);
@@ -172,6 +189,19 @@ public class JocTest {
 	 */
 	@Test
 	public void testComprovarVaixells() {
+		//SORTIDES POSSIBLES
+		String sortidaError = "==============ERROR===============\n"
+				+ "Coordenada referenciada incorrecta\n"
+				+ "==============ERROR===============\n";
+		String sortidaAigua = "Has donat a l'aigua\n"
+				+ "=================";
+		String sortidaJaTocat = "Ja has tocat un vaixell amb anterioritat\n"
+				+ "========================================";
+		String sortidaTocat = "Has tocat un vaixell!\n"
+				+ "=====================";
+		String sortidaGuanyat = "============\n"
+				+ "Has Guanyat!\n"
+				+ "============";
 		/*
 		 * Tauler 1: 
 		 * I O O
@@ -183,31 +213,49 @@ public class JocTest {
 		this.j.initVaixells(3); // per inicialitzar variable vaixellsRestants,
 		// a continuació resetejem el tauler
 
-		estat[][] tauler1 = { { estat.VAIXELL, estat.AIGUA, estat.AIGUA }, 
-				{ estat.AIGUA, estat.VAIXELL, estat.AIGUA },
-				{ estat.AIGUA, estat.AIGUA, estat.VAIXELL } };
+		casella[][] tauler1 = { { casella.VAIXELL, casella.AIGUA, casella.AIGUA }, 
+				{ casella.AIGUA, casella.VAIXELL, casella.AIGUA },
+				{ casella.AIGUA, casella.AIGUA, casella.VAIXELL } };
 
 		this.j.setTauler(tauler1);
-
+		assertNull("", this.j.getSortida());
 		assertEquals(3, this.j.getVaixellsRestants());
+		
+		// Disparem fora del tauler i comprovem que no passa res, nomes mostra
+		// error.
+		j.dispara(3, 0); // Branch 1 (comprovem els dos casos del IF)
+		j.dispara(0, 3);  // Branch 2
+		assertEquals(3, this.j.getVaixellsRestants());
+		
+		j.dispara(-1, 0); // Disparem a aigua en negatiu per la fila i comprovem que no decrementa
+		assertEquals(3, this.j.getVaixellsRestants());
+		assertEquals(sortidaError, this.j.getSortida());
+		j.dispara(0, -1); // Disparem a aigua en negatiu per la columna i comprovem que no decrementa
+		assertEquals(3, this.j.getVaixellsRestants());
+		assertEquals(sortidaError, this.j.getSortida());
 
 		j.dispara(0, 1); // Disparem a aigua i comprovem que no decrementa
 		assertEquals(3, this.j.getVaixellsRestants());
+		assertEquals(sortidaAigua, this.j.getSortida());
 
 		j.dispara(0, 0); // Disparem a baixell i comprovem que decrementa
 		assertEquals(2, this.j.getVaixellsRestants());
+		assertEquals(sortidaTocat, this.j.getSortida());
 
 		j.dispara(0, 0); // Tornem a disparar al mateix lloc i comprovem que no
-		// decrementa el comptador per error
+						// decrementa el comptador per error
 		assertEquals(2, this.j.getVaixellsRestants());
+		assertEquals(sortidaJaTocat, this.j.getSortida());
 
 		j.dispara(2, 1); // Tornem a disparar aigua i comprovem que no decrem.
 		assertEquals(2, this.j.getVaixellsRestants());
+		assertEquals(sortidaAigua, this.j.getSortida());
 
 		// Disparem als dos vaixells que queden i comprovem final de partida
 		j.dispara(1, 1);
 		j.dispara(2, 2);
 		assertEquals(0, this.j.getVaixellsRestants());
+		assertEquals(sortidaGuanyat, this.j.getSortida());
 
 		/*
 		 * Tauler 2 (cas límit, una posició i 1 vaixell): 
@@ -254,11 +302,11 @@ public class JocTest {
 		this.j.initTauler();
 		this.j.initVaixells(8);
 
-		estat[][] tauler2 = { { estat.AIGUA, estat.VAIXELL, estat.AIGUA, estat.VAIXELL, estat.AIGUA },
-				{ estat.VAIXELL, estat.AIGUA, estat.AIGUA, estat.AIGUA, estat.VAIXELL },
-				{ estat.AIGUA, estat.AIGUA, estat.AIGUA, estat.AIGUA, estat.VAIXELL },
-				{ estat.VAIXELL, estat.AIGUA, estat.AIGUA, estat.AIGUA, estat.AIGUA },
-				{ estat.VAIXELL, estat.AIGUA, estat.AIGUA, estat.VAIXELL, estat.AIGUA },};
+		casella[][] tauler2 = { { casella.AIGUA, casella.VAIXELL, casella.AIGUA, casella.VAIXELL, casella.AIGUA },
+				{ casella.VAIXELL, casella.AIGUA, casella.AIGUA, casella.AIGUA, casella.VAIXELL },
+				{ casella.AIGUA, casella.AIGUA, casella.AIGUA, casella.AIGUA, casella.VAIXELL },
+				{ casella.VAIXELL, casella.AIGUA, casella.AIGUA, casella.AIGUA, casella.AIGUA },
+				{ casella.VAIXELL, casella.AIGUA, casella.AIGUA, casella.VAIXELL, casella.AIGUA },};
 
 		this.j.setTauler(tauler2);
 
@@ -294,6 +342,211 @@ public class JocTest {
 		j.dispara(4, 0);
 		j.dispara(4, 3);
 		assertEquals(0, this.j.getVaixellsRestants()); // comprovem final joc
+	}
+	
+	/**
+	 * Fem Test de la Funcio Dispara amb metode de Caixa Blanca calculant el
+	 * Path Coverage 
+	 * 			1		(esquerra True, dret False)
+	 * 		   / \
+	 * 		  /	  3
+	 * 		 /	 / \
+	 * 		/   /   5		Arcs: 	13
+	 * 	   /    4  / \		Nodes:	10
+	 *    2   	 \ 6  7		V(G):	13-10+2 = 5
+	 * 	   \  	  \ \ |		Path: 	5
+	 * 	    \      \_\|
+	 *       \        8		Path1: !1,!3,!5,7,8,9,10
+	 * 	      \      / \	Path2: !1,!3,!5,7,!8,10
+	 * 	       \    /  /	Path3: !1,!3,5,6,8,10
+	 *          \  9  /		Path4: !1,!3,4,8,10
+	 *           \ | /		Path5: 1,2,10
+	 *            \|/
+	 * 		       10 
+	 */
+	@Test
+	public void testDispara() {
+		
+		/*
+		 * Path1: !1,!3,!5,7,8,9,10
+		 * Tauler: 
+		 * I
+		 */
+		this.j = new Joc(1);
+		this.j.initTauler();
+		this.j.initVaixells(1);
+		casella[][] taulerPath1 = { { casella.VAIXELL } };
+		this.j.setTauler(taulerPath1);
+		assertEquals(1, this.j.getVaixellsRestants());
+		j.dispara(0, 0); 
+		assertEquals(0, this.j.getVaixellsRestants());
+		assertTrue(j.getEstat().equals(estat.GUANYAT));
+		
+		/*
+		 * Path2: !1,!3,!5,7,!8,10
+		 * Tauler: 
+		 * I I
+		 * O O
+		 */
+		this.j = new Joc(2);
+		this.j.initTauler();
+		this.j.initVaixells(2);
+		casella[][] taulerPath2 = { { casella.VAIXELL,casella.VAIXELL },
+				{ casella.AIGUA,casella.AIGUA }};
+		this.j.setTauler(taulerPath2);
+		assertEquals(2, this.j.getVaixellsRestants());
+		j.dispara(0, 0); 
+		assertEquals(1, this.j.getVaixellsRestants());
+		assertTrue(j.getEstat().equals(estat.JUGANT));
+		
+		/*
+		 * Path3: !1,!3,5,6,8,10
+		 * Tauler: 
+		 * I I
+		 * O O
+		 */
+		this.j = new Joc(2);
+		this.j.initTauler();
+		this.j.initVaixells(2);
+		casella[][] taulerPath3 = { { casella.VAIXELL,casella.VAIXELL },
+				{ casella.AIGUA,casella.AIGUA }};
+		this.j.setTauler(taulerPath3);
+		assertEquals(2, this.j.getVaixellsRestants());
+		j.dispara(1, 0); 
+		assertEquals(2, this.j.getVaixellsRestants());
+		assertTrue(j.getEstat().equals(estat.JUGANT));
+		
+		/*
+		 * Path4: !1,!3,4,8,10
+		 * Tauler: 
+		 * I O
+		 * O O
+		 */
+		this.j = new Joc(2);
+		this.j.initTauler();
+		this.j.initVaixells(1);
+		casella[][] taulerPath4 = { { casella.VAIXELL,casella.AIGUA },
+				{ casella.AIGUA,casella.AIGUA }};
+		this.j.setTauler(taulerPath4);
+		assertEquals(1, this.j.getVaixellsRestants());
+		j.dispara(1, 0); 
+		assertEquals(1, this.j.getVaixellsRestants());
+		assertTrue(j.getEstat().equals(estat.JUGANT));
+		
+		/*
+		 * Path5: 1,2,10
+		 * Tauler: 
+		 * I
+		 */
+		this.j = new Joc(1);
+		this.j.initTauler();
+		this.j.initVaixells(1);
+		casella[][] taulerPath5 = { { casella.VAIXELL }};
+		this.j.setTauler(taulerPath5);
+		assertEquals(1, this.j.getVaixellsRestants());
+		j.dispara(1, 0); 
+		assertEquals(1, this.j.getVaixellsRestants());
+		assertTrue(j.getEstat().equals(estat.JUGANT));
+		
+	}
+	
+	/**
+	 * Creem una partida hardcoded i comprovem que el que es printa del tauler
+	 * (String print) correspon amb el que toca, fent ús del "equals".
+	 */
+	@Test
+	public void testPrintTauler() {
+		/*
+		 * Tauler 1: 
+		 * I O O
+		 * O I O
+		 * O O I
+		 */
+		this.j = new Joc(3);
+		this.j.initTauler();
+		this.j.initVaixells(3); // per inicialitzar variable vaixellsRestants,
+		// a continuació resetejem el tauler
+
+		casella[][] tauler = { { casella.VAIXELL, casella.AIGUA, casella.AIGUA }, 
+				{ casella.AIGUA, casella.VAIXELL, casella.AIGUA },
+				{ casella.AIGUA, casella.AIGUA, casella.VAIXELL } };
+
+		this.j.setTauler(tauler);
+				
+		MockJoc m = new MockJoc();
+		
+		assertEquals(m.printTauler(), this.j.printTauler());
+		
+		// Disparem a un vaixell i comprovem que s'imprimeix correctament.
+		j.dispara(0, 0);
+		
+		String tauler2 = "	1	2	3	\n" + 
+				"1	X 	= 	= 	\n" + 
+				"2	= 	I 	= 	\n" + 
+				"3	= 	= 	I 	\n";
+		
+		assertEquals(tauler2, this.j.printTauler());
+		
+		// Finalment disparem a aigua i comprovem que el tauler no s'inmuta.
+		j.dispara(0, 1);
+		assertEquals(tauler2, this.j.printTauler());
+	}
+	
+	@Test
+	public void testEstatJoc() {
+		// Testegem estat INIT, cada cop que iniciem un joc es compliran els
+		// següents 3 estats
+		this.j = new Joc(3);
+		assertEquals(estat.INIT, j.getEstat());
+		
+		this.j.initTauler();
+		assertEquals(estat.INIT, j.getEstat());
+		
+		this.j.initVaixells(3);
+		assertEquals(estat.JUGANT, j.getEstat());
+		
+		// Creem un tauler amb 4 caselles i 4 vaixells i anem disparant 1 a 1
+		// i comprovem que no es guanya fina a l'últim.
+		this.j = new Joc(2);
+		this.j.initTauler();
+		this.j.initVaixells(4);
+
+		j.dispara(0, 0);
+		assertEquals(estat.JUGANT, j.getEstat());
+		j.dispara(0, 1);
+		assertEquals(estat.JUGANT, j.getEstat());
+		j.dispara(1, 0);
+		assertEquals(estat.JUGANT, j.getEstat());
+		// Tornem a disparar a una casella on ja li hem donat per veure que
+		// seguim jugant
+		j.dispara(0, 1);
+		assertEquals(estat.JUGANT, j.getEstat());
+		
+		// disparem a últim vaixell i comprovem guanyada
+		j.dispara(1, 1);
+		assertEquals(estat.GUANYAT, j.getEstat());
+		
+		
+		// Cas límit, creem un tauler de 4 posicions i 1 vaixell, disparem a
+		// les 3 aigues, comprovem estar, disparem al vaixell i comprovem final.
+		this.j = new Joc(2);
+		this.j.initTauler();
+		this.j.initVaixells(1); // per inicialitzar variable vaixellsRestants,
+		// a continuació resetejem el tauler
+		
+		casella[][] tauler = { { casella.VAIXELL, casella.AIGUA }, 
+				{ casella.AIGUA, casella.AIGUA } };
+
+		this.j.setTauler(tauler);
+		
+		// Disparem a les 3 aigues
+		j.dispara(0, 1);
+		j.dispara(1, 0);
+		j.dispara(1, 1);
+		assertEquals(estat.JUGANT, j.getEstat());
+		
+		j.dispara(0, 0);
+		assertEquals(estat.GUANYAT, j.getEstat());
 	}
 
 }
