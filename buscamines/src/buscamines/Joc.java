@@ -9,7 +9,7 @@ enum dificultat {
 };
 
 enum casella {
-	MINA, LLIURE, DESCOBERT
+	MINA, LLIURE, DESCOBERT, BANDERAOK, BANDERAKO
 };
 
 public class Joc {
@@ -22,7 +22,7 @@ public class Joc {
 	public boolean getExplosio() {
 		return this.explosio;
 	}
-	
+
 	public casella[][] getTauler() {
 		return this.tauler;
 	}
@@ -100,7 +100,9 @@ public class Joc {
 	}
 
 	public String printTauler() {
-		String print = "";
+		String print = "\n";
+
+		print = print.concat("Caselles lliures: " + this.casellesLliures + "\n\n");
 
 		print = print.concat("\t");
 		// Imprimim fila superior amb índex de números
@@ -124,6 +126,10 @@ public class Joc {
 					} else {
 						print = print.concat(this.recompteMines(fila, columna) + " \t");
 					}
+					break;
+				case BANDERAOK:
+				case BANDERAKO:
+					print = print.concat("P \t");
 					break;
 				}
 			}
@@ -178,10 +184,37 @@ public class Joc {
 					}
 				}
 				break;
+				default:
+					System.out.println("No es pot trepitjar una casella amb bandera!");
 			}
 		}
 	}
-/*
+	
+	public void bandera(int fila, int columna) {
+		if (fila > this.tauler.length - 1 || columna > this.tauler[0].length - 1) {
+			System.out.println("==================================");
+			System.out.println("Coordenada referenciada incorrecta");
+			System.out.println("==================================");
+		} else {
+			switch (this.tauler[fila][columna]) {
+			case MINA:
+				this.tauler[fila][columna] = casella.BANDERAOK;
+				break;
+			case LLIURE:
+				this.tauler[fila][columna] = casella.BANDERAKO;
+				break;
+			case BANDERAOK:
+				this.tauler[fila][columna] = casella.MINA;
+				break;
+			case BANDERAKO:
+				this.tauler[fila][columna] = casella.LLIURE;
+				break;
+			default:
+				System.out.println("No es pot posar bandera a una casella descoberta!");
+			}
+		}
+	}
+
 	public void juga() {
 		Scanner entrada = new Scanner(System.in);
 		int fila, columna;
@@ -192,12 +225,38 @@ public class Joc {
 		if (this.tauler != null) {
 			do {
 				System.out.println(this.printTauler());
-				System.out.println("Introdueix la fila a trepitxar: ");
-				fila = entrada.nextInt() - 1;
-				System.out.println("Introdueix la columna a trepitxar: ");
-				columna = entrada.nextInt() - 1;
+				System.out.println("Indica: 1) Trepitjar\t2) Canvi de bandera:");
+				String o = entrada.nextLine();
+				int opcio = Integer.parseInt(o);
+				
+				System.out.println("Introdueix la fila: ");			
+				do {
+					String d = entrada.nextLine();
+					try {
+						fila = Integer.parseInt(d) - 1;
+					} catch (NumberFormatException e) {
+						fila = -1;
+						System.out.println("Introdueix un valor valid de fila!");
+					}
+				} while (fila == -1);				
+				System.out.println("Introdueix la columna: ");
+				do {
+					String d = entrada.nextLine();
+					try {
+						columna = Integer.parseInt(d) - 1;
+					} catch (NumberFormatException e) {
+						columna = -1;
+						System.out.println("Introdueix un valor valid de columna!");
+					}
+				} while (columna == -1);				
 
-				this.trepitja(fila, columna);
+				if(opcio == 1) {
+					this.trepitja(fila, columna);
+				}
+				else {
+					this.bandera(fila, columna);
+				}
+				
 			} while (this.casellesLliures > 0 && !explosio);
 			System.out.println(this.printTauler());
 			if (!explosio) {
@@ -215,9 +274,19 @@ public class Joc {
 		Scanner entrada = new Scanner(System.in);
 		dificultat dificultat = null;
 		System.out.println("Introdueix la dificultat (1 FACIL; 2 MIG; 3 DIFÍCIL): ");
-		int d = entrada.nextInt();
+		int nivell;
 
-		switch (d) {
+		do {
+			String d = entrada.nextLine();
+			try {
+				nivell = Integer.parseInt(d);
+			} catch(NumberFormatException e) {
+				nivell = 0;
+				System.out.println("Introdueix un valor correcte! (1, 2 o 3):");
+			}			
+		} while(nivell < 1 || nivell > 3);
+
+		switch (nivell) {
 		case 1:
 			dificultat = buscamines.dificultat.FACIL;
 			break;
@@ -236,5 +305,5 @@ public class Joc {
 		j.juga();
 
 		entrada.close();
-	}*/
+	}
 }

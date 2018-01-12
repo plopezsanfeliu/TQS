@@ -51,7 +51,7 @@ public class JocTest {
 		final int MAX_LOOPS = 100;
 		dificultat[] dificultats = { dificultat.FACIL, dificultat.MIG, dificultat.DIFICIL };
 
-		// INICI LOOP TEST
+		// INICI LOOP ANIUATS TEST
 		for (int iter = 0; iter < MAX_LOOPS; iter++) {
 			for (dificultat dificultat_actual : dificultats) {
 				this.j = new Joc(dificultat_actual);
@@ -160,9 +160,17 @@ public class JocTest {
 	@Test
 	public void testComprovarMines() {
 		/*
-		 * Tauler 1: O X O O O O O O O O O O O O O O X O X O O X O O O O X O O O O O O O
-		 * O O O O O O O O O O O O O O O O O O O X O O O O O O O O O O O O O X O O O O O
-		 * O O O O O O O O X O O O O O O X O O O O O O O O O O X
+		 * Tauler 1: 
+		 * O X O O O O O O O O
+		 * O O O O O O X O X O 
+		 * O X O O O O X O O O 
+		 * O O O O O O O O O O 
+		 * O O O O O O O O O O 
+		 * O O O X O O O O O O 
+		 * O O O O O O O X O O 
+		 * O O O O O O O O O O 
+		 * O X O O O O O O X O
+		 * O O O O O O O O O X
 		 */
 		this.j = new Joc(dificultat.FACIL);
 		this.j.initTauler();
@@ -265,7 +273,7 @@ public class JocTest {
 														casella.LLIURE, casella.LLIURE, casella.MINA }, };
 		j.setTauler(tauler);
 		
-		assertEquals(m.printTauler(), this.j.printTauler());
+		assertTrue(this.j.printTauler().contains(m.printTauler()));
 
 		// Provem de trepitjar una casella i mirem que el resultat sigui l¡esperat
 		j.trepitja(4, 5);
@@ -280,12 +288,12 @@ public class JocTest {
 				"8	O 	O 	1 	 	 	 	1 	2 	2 	1 	\n" + 
 				"9	O 	X 	1 	 	 	 	 	1 	X 	O 	\n" + 
 				"10	O 	O 	1 	 	 	 	 	1 	O 	X \t\n";
-		assertEquals(actual, this.j.printTauler());
+		assertTrue(this.j.printTauler().contains(actual));
 		
 	}
 
 }
 
-// Exploratory testing: 205-209
+// Exploratory testing: 153-157, 205-209
 // Loop test: 55, 97
 // Mock objects: 241, 268
